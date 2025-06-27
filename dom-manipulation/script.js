@@ -114,10 +114,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /*
+     * Handles the file import process.
+     * @param {Event} event - The file input change event.
+     */
+    function importQuotes(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedQuotes = JSON.parse(e.target.result);
+                // Basic validation
+                if (Array.isArray(importedQuotes) && importedQuotes.every(q => q.text && q.category)) {
+                    // Replace existing quotes with imported ones
+                    quotes.push(...importedQuotes);
+                    // Remove duplicates
+                    const uniqueQuotes = Array.from(new Set(quotes.map(a => a.text)))
+                        .map(text => {
+                            return quotes.find(a => a.text === text)
+                        });
+                    quotes = uniqueQuotes;
+                    saveQuotes();
+                    alert('Quotes imported successfully!');
+                    showRandomQuote();
+                } else {
+                    alert('Invalid JSON file format. Expected an array of objects with "text" and "category" properties.');
+                }
+            } catch (error) {
+                alert('Error reading or parsing the file.');
+                console.error(error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+
     // --- INITIALIZATION ---
 
-    // Attach event listener to the "Show New Quote" button
+    // Load quotes from storage
+    loadQuotes();
+
+    // Attach event listeners
     newQuoteBtn.addEventListener('click', showRandomQuote);
+    exportJsonBtn.addEventListener('click', exportQuotes);
+    importFileInput.addEventListener('change', importQuotes);
+    
+
+    // --- INITIALIZATION ---
     
     // Dynamically build the form for adding new quotes
     createAddQuoteForm();
