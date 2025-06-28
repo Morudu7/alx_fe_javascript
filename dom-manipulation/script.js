@@ -88,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Basic validation
         if (newQuoteText && newQuoteCategory) {
             // Create a new quote object
-             localStorage.setItem('addQuote', JSON.stringify(addQuote));
+             const storedQoute = JSON.parse(localStorage.getItem('addQoute') || '[]');
+             localStorage.setItem('storedQoute', JSON.stringify(addQuote));
             const newQuote = {
                 text: newQuoteText,
                 category: newQuoteCategory
