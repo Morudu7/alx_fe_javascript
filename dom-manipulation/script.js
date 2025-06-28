@@ -17,6 +17,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- FUNCTIONS ---
 
+     
+    /**
+     * Populates the category filter dropdown with unique categories from the quotes array.
+     */
+    function populateCategories() {
+        // Extract unique categories, using a Set to avoid duplicates
+        const categories = new Set(quotes.map(quote => quote.category));
+        
+        // Clear existing options, but keep the "All Categories" default
+        categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+        // Create and append an option for each unique category
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categoryFilter.appendChild(option);
+        });
+
+        // Restore the last selected filter from local storage
+        const lastFilter = localStorage.getItem('lastFilterCategory');
+        if (lastFilter) {
+            categoryFilter.value = lastFilter;
+        }
+    }
+
+
     /**
      * Selects a random quote from the array and displays it in the DOM.
      */
@@ -40,6 +67,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Append new elements to the display container
         quoteDisplay.appendChild(quoteTextElement);
         quoteDisplay.appendChild(quoteCategoryElement);
+    }
+
+     
+    /**
+     * Triggered on category selection. Saves the preference and updates the display.
+     */
+    function filterQuotes() {
+        const selectedCategory = categoryFilter.value;
+        localStorage.setItem('lastFilterCategory', selectedCategory);
+        showRandomQuote();
     }
 
     /**
@@ -94,6 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 text: newQuoteText,
                 category: newQuoteCategory
             };
+
+             // Repopulate categories to include the new one if it's unique
+            populateCategories(); 
+            // Set filter to the newly added category
+            categoryFilter.value = newQuoteCategory;
+            filterQuotes(); // Save and update view
+
 
             // Add the new quote to the array
             quotes.push(newQuote);
