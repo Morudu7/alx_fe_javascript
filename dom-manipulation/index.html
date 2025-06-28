@@ -11,5 +11,20 @@
     <button id="newQuote">Show New Quote</button>
     <script src="script.js"></script>
     <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+
+ <!-- Container for Import/Export functionality -->
+            <div id="dataManagementContainer" class="mt-8 border-t pt-6">
+                 <h2 class="text-2xl font-bold text-center text-gray-900 mb-4">Data Management</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="exportJson" class="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300">
+                        Export Quotes
+                    </button>
+                    <label for="importFile" class="w-full bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-300 text-center cursor-pointer">
+                        Import Quotes
+                    </label>
+                    <input type="file" id="importFile" accept="application/json">
+                 </div>
+            </div>
+
   </body>
   </html>
