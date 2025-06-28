@@ -13,7 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM ELEMENT REFERENCES ---
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
+    const exportJsonBtn = document.getElementById('exportJson');
+    const importFileInput = document.getElementById('importFile');
     const addQuoteContainer = document.getElementById('addQuoteContainer');
+    const serverStatus = document.getElementById('serverStatus');
+    const notification = document.getElementById('notification');
+    const syncNowBtn = document.getElementById('syncNow');
+    const categoryFilter = document.getElementById('categoryFilter');
+
     
     // --- FUNCTIONS ---
 
@@ -160,6 +167,99 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- SERVER SYNC & CONFLICT RESOLUTION ---
+
+    /**
+     * Fetches quotes from the server simulation.
+     */
+    async function fetchQuotesFromServer() {
+        try {
+            const response = await fetch(SERVER_URL);
+            const serverPosts = await response.json();
+            // Convert server posts to our quote format
+            return serverPosts.slice(0, 5).map(post => ({ // Limiting to 5 for demo purposes
+                text: post.title, // Using post title as quote text
+                category: "From Server" // Assigning a default category
+            }));
+        } catch (error) {
+            console.error("Error fetching from server:", error);
+            return [];
+        }
+    }
+
+    
+    /**
+     * Posts local quotes to the server (simulation).
+     * @param {object} quote - The quote to post.
+     */
+    async function postQuoteToServer(quote) {
+        try {
+            const response = await fetch(SERVER_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: quote.text,
+                    body: quote.category,
+                    userId: 1, // Mock user ID
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            });
+            const result = await response.json();
+            console.log("Posted to server:", result);
+        } catch (error) {
+            console.error("Error posting to server:", error);
+        }
+    }
+    
+    /**
+     * Main sync function: fetches server data, merges it, and handles conflicts.
+     */
+    async function syncQuotes() {
+        console.log("Syncing with server...");
+        const serverQuotes = await fetchQuotesFromServer();
+        const localQuotes = quotes;
+        let updated = false;
+
+        if(serverQuotes.length > 0) {
+            // Simple conflict resolution: Server data takes precedence.
+            // A more advanced strategy might involve timestamps or diffing.
+            const serverQuoteTexts = new Set(serverQuotes.map(q => q.text));
+            const newLocalQuotes = localQuotes.filter(q => !serverQuoteTexts.has(q.text));
+
+            const mergedQuotes = [...newLocalQuotes, ...serverQuotes];
+            
+            if (JSON.stringify(quotes) !== JSON.stringify(mergedQuotes)) {
+                quotes = mergedQuotes;
+                saveQuotes();
+                populateCategories();
+                showRandomQuote();
+                showNotification("Quotes updated from the server!");
+                updated = true;
+            }
+        }
+        
+        // Post local quotes that are not on the server (conceptual)
+        // In a real app, you'd track which quotes are new and need posting.
+        // For this demo, we won't post to avoid flooding the mock API.
+        
+        updateSyncStatus();
+        console.log(updated ? "Sync complete. Data updated." : "Sync complete. No changes.");
+    }
+    
+    function showNotification(message) {
+        notification.textContent = message;
+        notification.classList.remove('hidden');
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 5000);
+    }
+
+    function updateSyncStatus() {
+        const now = new Date();
+        serverStatus.textContent = `Last sync: ${now.toLocaleTimeString()}`;
+    }
+
     
     /**
      * Exports the current quotes array to a JSON file.
@@ -219,13 +319,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZATION ---
 
+     function init() {
+        loadQuotes();
+        populateCategories();
+        createAddQuoteForm();
+        
+        const lastFilter = localStorage.getItem('lastFilterCategory');
+        if (lastFilter) {
+            categoryFilter.value = lastFilter;
+        }
+    }
+
     // Load quotes from storage
     loadQuotes();
 
     // Attach event listeners
     newQuoteBtn.addEventListener('click', showRandomQuote);
+    categoryFilter.addEventListener('change', filterQuotes);
     exportJsonBtn.addEventListener('click', exportQuotes);
     importFileInput.addEventListener('change', importQuotes);
+    syncNowBtn.addEventListener('click', syncWithServer);
     
 
     // --- INITIALIZATION ---
