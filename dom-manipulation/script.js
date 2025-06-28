@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+     // --- DATA & SERVER SIMULATION ---
+    let quotes = [];
+    const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Using JSONPlaceholder as a mock server
+    const defaultQuotes = [
+        { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
+        { text: "Strive not to be a success, but rather to be of value.", category: "Wisdom" }
+    ];
+
+
     // --- DATA ---
     // Initial array of quote objects
     const quotes = [
