@@ -116,6 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    
+    /**
+     * Exports the current quotes array to a JSON file.
+     */
+    function exportQuotes() {
+        const dataStr = JSON.stringify(quotes, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'quotes.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url); // Clean up
+    }
+
     /*
      * Handles the file import process.
      * @param {Event} event - The file input change event.
