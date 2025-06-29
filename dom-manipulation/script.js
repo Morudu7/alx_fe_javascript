@@ -8,17 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { text: "Strive not to be a success, but rather to be of value.", category: "Wisdom" }
     ];
 
-
-    // --- DATA ---
-    // Initial array of quote objects
-    const quotes = [
-        { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
-        { text: "Strive not to be a success, but rather to be of value.", category: "Wisdom" },
-        { text: "The mind is everything. What you think you become.", category: "Philosophy" },
-        { text: "An unexamined life is not worth living.", category: "Socrates" },
-        { text: "Your time is limited, so don’t waste it living someone else’s life.", category: "Motivation" }
-    ];
-
     // --- DOM ELEMENT REFERENCES ---
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
