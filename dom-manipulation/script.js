@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveQuotes();
                 populateCategories();
                 showRandomQuote();
-                showNotification("Quotes updated from the server!");
+                showNotification("Quotes synced with server!");
                 updated = true;
             }
         }
