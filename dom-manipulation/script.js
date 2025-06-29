@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Handles adding a new quote to the array from the form inputs.
      */
-    function addQuote() {
+    async function addQuote() {
         const newQuoteText = document.getElementById('newQuoteText').value.trim();
         const newQuoteCategory = document.getElementById('newQuoteCategory').value.trim();
 
@@ -160,12 +160,53 @@ document.addEventListener('DOMContentLoaded', () => {
             
             console.log('Updated quotes array:', quotes);
 
+            //Post the new quote to the server
+            await postQuoteToServer(newQuote);
         } else {
             alert('Please fill in both the quote and its category.');
         }
+
+        
     }
 
     // --- SERVER SYNC & CONFLICT RESOLUTION ---
+
+
+    /**
+     * Posts a single quote to the mock server.
+     * @param {object} quote - The quote object with text and category.
+     */
+    async function postQuoteToServer(quote) {
+        try {
+            const response = await fetch(SERVER_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: quote.text,   // Map our 'text' to the 'title' field of the API
+                    body: quote.category, // Map our 'category' to the 'body' field of the API
+                    userId: 1,            // Mock user ID as required by the API
+                }),
+                headers: {
+                    // Set the Content-Type header to indicate JSON data
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Successfully posted to server:", result);
+            // Provide feedback to the user
+            showNotification(`Quote "${result.title.slice(0, 20)}..." was posted to the server.`);
+
+        } catch (error) {
+            console.error("Error posting to server:", error);
+            showNotification("Failed to post quote to the server.");
+        }
+    }
+
+
 
     /**
      * Fetches quotes from the server simulation.
@@ -253,6 +294,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
 
+    /**
+     * Updates the sync status timestamp in the UI.
+     */
     function updateSyncStatus() {
         const now = new Date();
         serverStatus.textContent = `Last sync: ${now.toLocaleTimeString()}`;
