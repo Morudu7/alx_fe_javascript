@@ -390,4 +390,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show the first random quote when the page loads
     showRandomQuote();
+     // Attach all event listeners
+        newQuoteBtn.addEventListener('click', showRandomQuote);
+        categoryFilter.addEventListener('change', filterQuotes);
+        exportJsonBtn.addEventListener('click', exportQuotes);
+        importFileInput.addEventListener('change', importQuotes);
+        syncNowBtn.addEventListener('click', syncWithServer);
+        
+        // Periodic sync every 60 seconds (60000 ms)
+        syncWithServer(); // Initial sync on page load
+        setInterval(syncWithServer, 60000);
 });
